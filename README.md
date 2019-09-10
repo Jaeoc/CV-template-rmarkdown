@@ -11,3 +11,5 @@ The main difference from Steven Miller's version is that I:
 That is, I use knitr tables to format my output rather than writing manual markdown and latex for each data point in the R-markdown file.
 
 For the filler data in the template I mainly copied from Steven Miller's  William Sealy Gosset CV, but some datapoints are just made up.
+
+[picture]: https://github.com/Jaeoc/CV-template-rmarkdown/cv_template.png "picture text"
