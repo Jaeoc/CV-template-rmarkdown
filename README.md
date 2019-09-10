@@ -1,5 +1,5 @@
 # CV template - PDF from rmarkdown
-This is a more generic version of my own CV (available at [olssoncollentine.com/files/cv.pdf](olssoncollentine.com/files/cv.pdf)) which can be used as a template. It is adapted from Steven Miller's template: http://svmiller.com/blog/2016/03/svm-r-markdown-cv/
+This is a more generic version of my own CV (available at https://www.olssoncollentine.com/files/cv.pdf) which can be used as a template. It is adapted from Steven Miller's template: http://svmiller.com/blog/2016/03/svm-r-markdown-cv/
 
 The main difference from Steven Miller's version is that I:
 
