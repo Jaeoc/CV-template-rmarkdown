@@ -1,0 +1,165 @@
+---
+output: 
+  pdf_document:
+    latex_engine: pdflatex
+    template: svm-latex-cv.tex
+geometry: margin=1in
+keep_tex: FALSE
+
+
+title: "CV"
+author: William Sealy Gosset
+
+jobtitle: "Chief Brewer, Arthur Guinness & Son"
+address: "Guinness Brewery · Park Royal · London NW10 7RR, UK"
+fontawesome: yes
+email: guinness@consumer-care.net
+#github: jaeoc
+#twitter: a_collentine
+#osf: "Enter 5 digit osf string here"
+#phone: ""
+web: guiness.com
+updated: yes
+
+keywords: R Markdown, academic CV, template
+
+fontfamily: mathpazo
+fontfamilyoptions: sc, osf
+fontsize: 11pt
+linkcolor: blue
+urlcolor: blue
+---
+ 
+<!-- Adapted from Steven Miller's template: http://svmiller.com/blog/2016/03/svm-r-markdown-cv/ 
+For kableExtra to function I had to add some packages to the .tex preamble: \usepackage{float}, \usepackage{array}, \usepackage{booktabs}, \usepackage{tabu}-->
+
+<!-- In addition, I have added \usepackage{titlesec} + two lines of code in .tex preamble to get lines under each header following this stackexchange question: https://tex.stackexchange.com/questions/84061/how-can-i-make-a-bold-horizontal-rule-under-each-section-title -->
+
+<!-- Inspired also by https://github.com/marsha5813/resume  -->
+
+\arrayrulecolor{white}
+<!-- This makes all lines in the tables invisible (white), when combined with adding the package \usepackage{colortbl} to the .tex preamble. See https://stackoverflow.com/questions/53868409/is-there-a-way-to-make-a-kable-without-lines-borders-for-pdf -->
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+
+if(!require(tibble)){install.packages("tibble")} #for data input
+if(!require(kableExtra)){install.packages("kableExtra")} #for formatting output
+
+library(kableExtra) #for more table options when printing
+```
+
+
+```{r data, cache=TRUE}
+
+#Input data for each section. New lines inside a table cell should be separated by ';'. Text until first ';' in the 'what'column will be bolded later.
+
+edu <- tibble::tribble(
+  ~when, ~what,
+  "1899", "B.A. Chemistry; Oxford University, the UK",
+)
+
+
+employment <- tibble::tribble(
+  ~when, ~what, 
+  "1935 - 1937", "Chief Brewer ; Arthur Guinness & Son, the UK",
+  "1899 - 1935", "Researcher ; Arthur Guinness & Son, the UK"
+)
+
+teach <- tibble::tribble(
+  ~when, ~what, 
+  "1932 - 1937", "Hypothesis testing; Oxford, the UK"
+  )
+
+papers <- tibble::tribble(
+  ~when, ~what,
+  "1938", "Student. 1938. Comparison between Balanced and Random Arrangements on Field Plots. Biometrika 29(3-4): 363--378",
+  "1936", "Student. 1936. Co-operation in Large Scale Experiments. Supplement to Journal of the Royal Statistical Society 3(2)"
+)
+
+talk <- tibble::tribble(
+  ~when,  ~what,
+  "1935", 'Agricultural Development Society (invited talk); Cambridge, the UK; "Errors in Routine Analysis"',
+)
+
+memberships <- c(
+  "Statistical Greats (SG)"
+)
+```
+
+
+```{r table_functions}
+#Function to format the input data and make it ready for printing
+
+format_output <- function(input){
+  #Make text until first ';' bold
+  text_to_bold <- unlist(lapply(strsplit(input$what, split = ";"), function(x) x[[1]])) #extract until first ';' for each data point
+  text_to_bold <- gsub("\\(", "\\\\(", text_to_bold) #any left parentheses must be escaped so gsub works two lines down 
+  input$what <- gsub("&", "\\\\&", input$what) #& must be escaped
+  input$what <- mapply(gsub, text_to_bold, paste0("\\\\textbf{", text_to_bold, "}"), input$what) #replace by (latex) bold version, mapply loops over each data point
+  
+  
+  #make a linebreak after each ';' when printing table (linebreak function adds some latex code)
+  input$what <- kableExtra::linebreak(input$what, linebreaker = ";")
+  
+  input
+}
+
+
+#function to create tables
+CV_table <- function(x){
+  knitr::kable(x, booktabs = TRUE, col.names = NULL, escape= FALSE, linesep = "\\addlinespace") %>% 
+  column_spec(1,"2.5cm", bold = TRUE) %>% 
+  column_spec(2, "13.3cm")}
+```
+
+```{r format-data}
+#Formatting, if changing names of data vectors, remember to change here and in tables later. NB! Change 'student' in the gsub call below to your own last name to bold it in the article section
+
+input <- list(education = edu,
+              employment = employment,
+              teaching = teach,
+              talks = talk)
+
+input <- lapply(input, format_output)
+
+#For education and institutional responsibilites, add empty row after each row so that there is space between entries in the output
+input[c("education", "employment")] <- lapply(input[c("education", "employment")], function(x) sapply(x, rbind, ""))
+
+#add papers to list, which needs different formatting
+input$papers <- papers
+input$papers$what <- gsub("Student", "\\\\textbf{Student}", input$papers$what) #bold NB! change 'Student' to your own name
+input$papers$what <- gsub("&", "\\\\&", input$papers$what) #& must be escaped
+```
+
+
+\vspace{1.2cm}
+<!-- Adds some vertical spacing between header and rest -->
+
+# Education
+
+`r input$education %>% CV_table()`
+
+
+# Employment
+
+
+`r input$employment %>% CV_table()`
+
+# Publications
+
+`r input$papers %>% CV_table()`
+
+# Talks and presentations
+
+`r input$talks %>% CV_table()`
+
+# Teaching
+
+`r input$teaching %>% CV_table()`
+
+# Professional memberships
+
+`r knitr::kable(memberships, booktabs = TRUE, col.names = NULL, escape= FALSE, linesep = "\\addlinespace")`
+
